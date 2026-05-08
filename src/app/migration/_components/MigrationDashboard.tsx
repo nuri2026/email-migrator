@@ -2,9 +2,22 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Download, Upload, CheckCircle2, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  Download,
+  Upload,
+  CheckCircle2,
+  Trash2,
+  Users,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,12 +55,19 @@ export function MigrationDashboard() {
       return res.json();
     },
     onSuccess: () => {
-      toast({ title: "Extraction Started", description: "Fetching data from Brevo..." });
+      toast({
+        title: "Extraction Started",
+        description: "Fetching data from Brevo...",
+      });
       queryClient.invalidateQueries({ queryKey: ["migration-stats"] });
       queryClient.invalidateQueries({ queryKey: ["migration-data"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Extraction Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Extraction Failed",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -61,12 +81,19 @@ export function MigrationDashboard() {
       return res.json();
     },
     onSuccess: () => {
-      toast({ title: "Sync Started", description: "Pushing data to HubSpot..." });
+      toast({
+        title: "Sync Started",
+        description: "Pushing data to HubSpot...",
+      });
       queryClient.invalidateQueries({ queryKey: ["migration-stats"] });
       queryClient.invalidateQueries({ queryKey: ["migration-data"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Sync Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Sync Failed",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -77,18 +104,25 @@ export function MigrationDashboard() {
       return res.json();
     },
     onSuccess: () => {
-      toast({ title: "Data Wiped", description: "Local staged data has been cleared." });
+      toast({
+        title: "Data Wiped",
+        description: "Local staged data has been cleared.",
+      });
       queryClient.invalidateQueries({ queryKey: ["migration-stats"] });
       queryClient.invalidateQueries({ queryKey: ["migration-data"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Wipe Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Wipe Failed",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Deals</CardTitle>
@@ -101,11 +135,27 @@ export function MigrationDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Companies & Contacts
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {(stats?.companies || 0) + (stats?.contacts || 0)}
+            </div>
+            <p className="text-xs text-muted-foreground">Linked entities</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Notes & Tasks</CardTitle>
             <Download className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(stats?.notes || 0) + (stats?.tasks || 0)}</div>
+            <div className="text-2xl font-bold">
+              {(stats?.notes || 0) + (stats?.tasks || 0)}
+            </div>
             <p className="text-xs text-muted-foreground">Associated records</p>
           </CardContent>
         </Card>
@@ -123,28 +173,43 @@ export function MigrationDashboard() {
 
       <div className="flex flex-col gap-4">
         <div className="flex gap-4">
-          <Button 
-            onClick={() => extractMutation.mutate()} 
+          <Button
+            onClick={() => extractMutation.mutate()}
             disabled={extractMutation.isPending}
             className="flex-1"
           >
-            {extractMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+            {extractMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
             Extract from Brevo
           </Button>
-          <Button 
-            onClick={() => syncMutation.mutate()} 
+          <Button
+            onClick={() => syncMutation.mutate()}
             disabled={syncMutation.isPending || (stats?.deals || 0) === 0}
             className="flex-1"
             variant="secondary"
           >
-            {syncMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+            {syncMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="mr-2 h-4 w-4" />
+            )}
             Sync to HubSpot
           </Button>
         </div>
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" className="text-destructive hover:bg-destructive/10 border-destructive/20" disabled={wipeMutation.isPending || (stats?.deals === 0 && stats?.notes === 0 && stats?.tasks === 0)}>
+            <Button
+              variant="outline"
+              className="text-destructive hover:bg-destructive/10 border-destructive/20"
+              disabled={
+                wipeMutation.isPending ||
+                (stats?.deals === 0 && stats?.notes === 0 && stats?.tasks === 0)
+              }
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Wipe Local Staged Data
             </Button>
@@ -153,13 +218,17 @@ export function MigrationDashboard() {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will delete all staged deals, notes, and tasks from your local database. 
-                This action cannot be undone and will not affect data in Brevo or HubSpot.
+                This will delete all staged deals, notes, and tasks from your
+                local database. This action cannot be undone and will not affect
+                data in Brevo or HubSpot.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => wipeMutation.mutate()} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              <AlertDialogAction
+                onClick={() => wipeMutation.mutate()}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
                 Wipe Data
               </AlertDialogAction>
             </AlertDialogFooter>

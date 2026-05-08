@@ -13,10 +13,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const [dealsCount, notesCount, tasksCount, syncedDealsCount] = await Promise.all([
+    const [dealsCount, notesCount, tasksCount, companiesCount, contactsCount, syncedDealsCount] = await Promise.all([
       prisma.brevoDeal.count(),
       prisma.brevoNote.count(),
       prisma.brevoTask.count(),
+      (prisma as any).brevoCompany.count(),
+      (prisma as any).brevoContact.count(),
       prisma.brevoDeal.count({ where: { hubspotId: { not: null } } }),
     ]);
 
@@ -24,6 +26,8 @@ export async function GET(request: NextRequest) {
       deals: dealsCount,
       notes: notesCount,
       tasks: tasksCount,
+      companies: companiesCount,
+      contacts: contactsCount,
       syncedDeals: syncedDealsCount,
     });
   } catch (error) {

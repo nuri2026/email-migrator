@@ -16,15 +16,15 @@ datasource db {
 // Better Auth Core Schema
 
 model User {
-  id            String    @id @default(uuid())
+  id            String            @id @default(uuid())
   name          String?
-  email         String?   @unique
+  email         String?           @unique
   emailVerified Boolean?
   image         String?
   password      String?
-  isAdmin       Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  isAdmin       Boolean           @default(false)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
   sessions      Session[]
   accounts      Account[]
   apiConfig     ApiConfiguration?
@@ -80,75 +80,118 @@ model Verification {
 // Migration Models
 
 model ApiConfiguration {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  brevoApiKey     String?
-  hubspotToken    String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  brevoApiKey  String?
+  hubspotToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("api_configuration")
 }
 
 model BrevoDeal {
-  id              String      @id @default(uuid())
-  brevoId         String      @unique
-  name            String
-  amount          String?
-  dealStage       String?
-  dealOwner       String?
-  companyName     String?
-  closeDate       DateTime?
-  rawJson         Json
-  hubspotId       String?     // Linked after migration
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  notes           BrevoNote[]
-  tasks           BrevoTask[]
-  activities      BrevoActivity[]
+  id          String          @id @default(uuid())
+  brevoId     String          @unique
+  name        String
+  amount      String?
+  dealStage   String?
+  dealOwner   String?
+  companyName String?
+  closeDate   DateTime?
+  rawJson     Json
+  hubspotId   String? // Linked after migration
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  notes       BrevoNote[]
+  tasks       BrevoTask[]
+  activities  BrevoActivity[]
+  companyId   String?
+  company     BrevoCompany?   @relation(fields: [companyId], references: [brevoId])
+  contacts    BrevoContact[]  @relation("DealToContact")
 
   @@map("brevo_deal")
 }
 
+model BrevoCompany {
+  id        String      @id @default(uuid())
+  brevoId   String      @unique
+  name      String
+  domain    String?
+  rawJson   Json
+  hubspotId String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  deals     BrevoDeal[]
+
+  @@map("brevo_company")
+}
+
+model BrevoContact {
+  id        String      @id @default(uuid())
+  brevoId   String      @unique
+  email     String      @unique
+  firstName String?
+  lastName  String?
+  rawJson   Json
+  hubspotId String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  deals     BrevoDeal[] @relation("DealToContact")
+
+  @@map("brevo_contact")
+}
+
 model BrevoActivity {
-  id              String   @id @default(uuid())
-  brevoId         String?  // Some activities might not have a Brevo ID
-  type            String   // e.g., "call", "email", "meeting"
-  content         String?
-  timestamp       DateTime
-  dealId          String
-  deal            BrevoDeal @relation(fields: [dealId], references: [brevoId])
-  hubspotId       String?
-  rawJson         Json
-  createdAt       DateTime @default(now())
+  id        String    @id @default(uuid())
+  brevoId   String? // Some activities might not have a Brevo ID
+  type      String // e.g., "call", "email", "meeting"
+  content   String?
+  timestamp DateTime
+  dealId    String
+  deal      BrevoDeal @relation(fields: [dealId], references: [brevoId])
+  hubspotId String?
+  rawJson   Json
+  createdAt DateTime  @default(now())
 
   @@map("brevo_activity")
 }
 
 model BrevoNote {
-  id              String     @id @default(uuid())
-  brevoId         String     @unique
-  body            String
-  dealId          String?
-  deal            BrevoDeal? @relation(fields: [dealId], references: [brevoId])
-  hubspotId       String?
-  rawJson         Json
-  createdAt       DateTime   @default(now())
+  id        String     @id @default(uuid())
+  brevoId   String     @unique
+  body      String
+  dealId    String?
+  deal      BrevoDeal? @relation(fields: [dealId], references: [brevoId])
+  hubspotId String?
+  rawJson   Json
+  createdAt DateTime   @default(now())
 
   @@map("brevo_note")
 }
 
 model BrevoTask {
-  id              String     @id @default(uuid())
-  brevoId         String     @unique
-  name            String
-  dueDate         DateTime?  
-  dealId          String?
-  deal            BrevoDeal? @relation(fields: [dealId], references: [brevoId])
-  hubspotId       String?
-  rawJson         Json
-  createdAt       DateTime   @default(now())
+  id        String     @id @default(uuid())
+  brevoId   String     @unique
+  name      String
+  dueDate   DateTime?
+  dealId    String?
+  deal      BrevoDeal? @relation(fields: [dealId], references: [brevoId])
+  hubspotId String?
+  rawJson   Json
+  createdAt DateTime   @default(now())
 
   @@map("brevo_task")
+}
+
+model MigrationLog {
+  id         String   @id @default(uuid())
+  entityType String // deal, note, task, company, contact
+  entityId   String // Brevo ID
+  status     String // success, error
+  message    String?
+  timestamp  DateTime @default(now())
+
+  @@map("migration_log")
 }

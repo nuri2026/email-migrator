@@ -107,13 +107,34 @@ Located in `src/app/migration/`:
    - Note to Deal: `note_to_deal` (type 214)
    - Task to Deal: `task_to_deal` (type 216)
 
-## 7. Phase 4: Data Preview & Management (In Progress)
+## 7. Implementation Progress & Status
 
-- **Detailed Preview**: Implement tabbed data tables to inspect staged Deals, Notes, and Tasks.
-- **Wipe Data**: Provide an administrative action to clear staged records.
-- **Sync Logging**: Granular UI feedback during the HubSpot import phase.
+- **Phase 1: Setup & API Config**: ✅ Completed
+  - [schema.prisma](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/prisma/schema.prisma) updated with migration models.
+  - [ConfigForm.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/migration/_components/ConfigForm.tsx) implemented for API key management.
+- **Phase 2: Brevo Extraction**: ✅ Completed
+  - [brevo-extraction-service.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/services/migration/brevo-extraction-service.ts) implemented with pagination support for Deals, Notes, and Tasks.
+- **Phase 3: HubSpot Loading**: ✅ Completed
+  - [hubspot-loading-service.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/services/migration/hubspot-loading-service.ts) implemented with HubSpot v4 Association API support.
+- **Phase 4: Data Preview & Management**: ✅ Completed
+  - [DataPreview.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/migration/_components/DataPreview.tsx) implemented with tabbed views for staged data.
+  - [MigrationDashboard.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/migration/_components/MigrationDashboard.tsx) implemented for process control.
+- **Phase 5: UI Integration**: ✅ Completed
+  - [page.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/migration/page.tsx) created to host the migration dashboard.
+- **Phase 6: Enhanced Associations**: ✅ Completed
+  - Added `BrevoCompany` and `BrevoContact` models to [schema.prisma](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/prisma/schema.prisma).
+  - Implemented extraction for Companies and Contacts in [brevo-extraction-service.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/services/migration/brevo-extraction-service.ts).
+  - Implemented sync and matching logic in [hubspot-loading-service.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/services/migration/hubspot-loading-service.ts).
+- **Phase 7: Robustness & Logging**: ✅ Completed
+  - Implemented rate limiting (100ms delay) in [hubspot-loading-service.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/services/migration/hubspot-loading-service.ts).
+  - Added `MigrationLog` model to track per-record success/failure.
+  - Updated [MigrationDashboard.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/migration/_components/MigrationDashboard.tsx) with detailed entity stats.
+- **Phase 8: Data Transformation & UI Polish**: ✅ Completed
+  - Expanded [DataPreview.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/migration/_components/DataPreview.tsx) with tabbed views for Companies, Contacts, and Migration Logs.
+  - Implemented relation-aware previews in the UI (e.g., showing linked contacts and companies for each deal).
+  - Enhanced [route.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/api/migration/data/route.ts) to support deep fetching of associated entities for preview.
 
-## 8. Security & Compliance
+## 9. Next Steps: Phase 9 - Final Validation & Cleanup
 
 - Better Auth ensures only authenticated users access the migration dashboard.
 - API keys are linked to the user account in the database.
