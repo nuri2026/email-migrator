@@ -13,11 +13,15 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // Delete in reverse order of dependencies
+    // Delete in reverse order of dependencies, scoped to the user
     await prisma.$transaction([
-      prisma.brevoNote.deleteMany(),
-      prisma.brevoTask.deleteMany(),
-      prisma.brevoDeal.deleteMany(),
+      (prisma as any).brevoNote.deleteMany({ where: { userId: session.user.id } }),
+      (prisma as any).brevoTask.deleteMany({ where: { userId: session.user.id } }),
+      (prisma as any).brevoActivity.deleteMany({ where: { userId: session.user.id } }),
+      (prisma as any).brevoDeal.deleteMany({ where: { userId: session.user.id } }),
+      (prisma as any).brevoCompany.deleteMany({ where: { userId: session.user.id } }),
+      (prisma as any).brevoContact.deleteMany({ where: { userId: session.user.id } }),
+      (prisma as any).migrationLog.deleteMany({ where: { userId: session.user.id } }),
     ]);
 
     return NextResponse.json({ message: "All staged migration data has been wiped." });

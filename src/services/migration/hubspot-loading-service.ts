@@ -6,9 +6,11 @@ const RATE_LIMIT_DELAY = 100; // ms between requests
 
 export class HubSpotLoadingService {
   private client: HubSpotClient;
+  private userId: string;
 
-  constructor(accessToken: string) {
+  constructor(accessToken: string, userId: string) {
     this.client = new HubSpotClient({ accessToken });
+    this.userId = userId;
   }
 
   private async sleep(ms: number) {
@@ -17,7 +19,7 @@ export class HubSpotLoadingService {
 
   private async log(entityType: string, entityId: string, status: 'success' | 'error', message?: string) {
     await (prisma as any).migrationLog.create({
-      data: { entityType, entityId, status, message }
+      data: { entityType, entityId, status, message, userId: this.userId }
     }).catch(console.error);
   }
 
@@ -31,7 +33,7 @@ export class HubSpotLoadingService {
 
   async syncCompanies() {
     const companies = await (prisma as any).brevoCompany.findMany({
-      where: { hubspotId: null },
+      where: { hubspotId: null, userId: this.userId },
     });
 
     for (const company of companies) {
@@ -60,7 +62,7 @@ export class HubSpotLoadingService {
 
   async syncContacts() {
     const contacts = await (prisma as any).brevoContact.findMany({
-      where: { hubspotId: null },
+      where: { hubspotId: null, userId: this.userId },
     });
 
     for (const contact of contacts) {
@@ -101,8 +103,8 @@ export class HubSpotLoadingService {
   }
 
   async syncDeals() {
-    const deals = await prisma.brevoDeal.findMany({
-      where: { hubspotId: null },
+    const deals = await (prisma as any).brevoDeal.findMany({
+      where: { hubspotId: null, userId: this.userId },
     });
 
     for (const deal of deals) {
@@ -134,8 +136,8 @@ export class HubSpotLoadingService {
 
   async syncEngagements() {
     // Sync Notes
-    const notes = await prisma.brevoNote.findMany({
-      where: { hubspotId: null },
+    const notes = await (prisma as any).brevoNote.findMany({
+      where: { hubspotId: null, userId: this.userId },
     });
 
     for (const note of notes) {
@@ -162,8 +164,8 @@ export class HubSpotLoadingService {
     }
 
     // Sync Tasks
-    const tasks = await prisma.brevoTask.findMany({
-      where: { hubspotId: null },
+    const tasks = await (prisma as any).brevoTask.findMany({
+      where: { hubspotId: null, userId: this.userId },
     });
 
     for (const task of tasks) {
@@ -193,10 +195,11 @@ export class HubSpotLoadingService {
 
   async rebuildAssociations() {
     // Associate Notes to Deals
-    const notes = await prisma.brevoNote.findMany({
+    const notes = await (prisma as any).brevoNote.findMany({
       where: { 
         hubspotId: { not: null },
-        dealId: { not: null }
+        dealId: { not: null },
+        userId: this.userId
       },
       include: { deal: true }
     });
@@ -224,10 +227,11 @@ export class HubSpotLoadingService {
     }
 
     // Associate Tasks to Deals
-    const tasks = await prisma.brevoTask.findMany({
+    const tasks = await (prisma as any).brevoTask.findMany({
       where: { 
         hubspotId: { not: null },
-        dealId: { not: null }
+        dealId: { not: null },
+        userId: this.userId
       },
       include: { deal: true }
     });
@@ -258,7 +262,8 @@ export class HubSpotLoadingService {
     const dealsWithCompany = await (prisma as any).brevoDeal.findMany({
       where: {
         hubspotId: { not: null },
-        companyId: { not: null }
+        companyId: { not: null },
+        userId: this.userId
       },
       include: { company: true }
     });
@@ -287,7 +292,7 @@ export class HubSpotLoadingService {
 
     // Associate Deals to Contacts
     const dealsWithContacts = await (prisma as any).brevoDeal.findMany({
-      where: { hubspotId: { not: null } },
+      where: { hubspotId: { not: null }, userId: this.userId },
       include: { contacts: true }
     });
 

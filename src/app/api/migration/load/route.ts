@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "HubSpot Token not configured" }, { status: 400 });
     }
 
-    const service = new HubSpotLoadingService(config.hubspotToken);
+    const service = new HubSpotLoadingService(config.hubspotToken, session.user.id);
     await service.syncAll();
 
     return NextResponse.json({ message: "Sync completed successfully" });

@@ -16,18 +16,25 @@ datasource db {
 // Better Auth Core Schema
 
 model User {
-  id            String            @id @default(uuid())
-  name          String?
-  email         String?           @unique
-  emailVerified Boolean?
-  image         String?
-  password      String?
-  isAdmin       Boolean           @default(false)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  apiConfig     ApiConfiguration?
+  id              String            @id @default(uuid())
+  name            String?
+  email           String?           @unique
+  emailVerified   Boolean?
+  image           String?
+  password        String?
+  isAdmin         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  sessions        Session[]
+  accounts        Account[]
+  apiConfig       ApiConfiguration?
+  brevoDeals      BrevoDeal[]
+  brevoCompanies  BrevoCompany[]
+  brevoContacts   BrevoContact[]
+  brevoActivities BrevoActivity[]
+  brevoNotes      BrevoNote[]
+  brevoTasks      BrevoTask[]
+  migrationLogs   MigrationLog[]
 
   @@map("user")
 }
@@ -93,6 +100,8 @@ model ApiConfiguration {
 
 model BrevoDeal {
   id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
   brevoId     String          @unique
   name        String
   amount      String?
@@ -116,6 +125,8 @@ model BrevoDeal {
 
 model BrevoCompany {
   id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
   brevoId   String      @unique
   name      String
   domain    String?
@@ -130,6 +141,8 @@ model BrevoCompany {
 
 model BrevoContact {
   id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
   brevoId   String      @unique
   email     String      @unique
   firstName String?
@@ -145,6 +158,8 @@ model BrevoContact {
 
 model BrevoActivity {
   id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
   brevoId   String? // Some activities might not have a Brevo ID
   type      String // e.g., "call", "email", "meeting"
   content   String?
@@ -160,6 +175,8 @@ model BrevoActivity {
 
 model BrevoNote {
   id        String     @id @default(uuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
   brevoId   String     @unique
   body      String
   dealId    String?
@@ -173,6 +190,8 @@ model BrevoNote {
 
 model BrevoTask {
   id        String     @id @default(uuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
   brevoId   String     @unique
   name      String
   dueDate   DateTime?
@@ -187,6 +206,8 @@ model BrevoTask {
 
 model MigrationLog {
   id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
   entityType String // deal, note, task, company, contact
   entityId   String // Brevo ID
   status     String // success, error

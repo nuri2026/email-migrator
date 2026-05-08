@@ -14,12 +14,12 @@ export async function GET(request: NextRequest) {
     }
 
     const [dealsCount, notesCount, tasksCount, companiesCount, contactsCount, syncedDealsCount] = await Promise.all([
-      prisma.brevoDeal.count(),
-      prisma.brevoNote.count(),
-      prisma.brevoTask.count(),
-      (prisma as any).brevoCompany.count(),
-      (prisma as any).brevoContact.count(),
-      prisma.brevoDeal.count({ where: { hubspotId: { not: null } } }),
+      (prisma as any).brevoDeal.count({ where: { userId: session.user.id } }),
+      (prisma as any).brevoNote.count({ where: { userId: session.user.id } }),
+      (prisma as any).brevoTask.count({ where: { userId: session.user.id } }),
+      (prisma as any).brevoCompany.count({ where: { userId: session.user.id } }),
+      (prisma as any).brevoContact.count({ where: { userId: session.user.id } }),
+      (prisma as any).brevoDeal.count({ where: { hubspotId: { not: null }, userId: session.user.id } }),
     ]);
 
     return NextResponse.json({

@@ -138,6 +138,11 @@ Located in `src/app/migration/`:
   - Implemented automatic UI refreshing (3s interval) during active migration phases.
   - Verified end-to-end extraction and synchronization flows.
   - Finalized security measures (Better Auth integration for all migration routes).
+- **Phase 10: Multi-User Scoping & Data Isolation**: ✅ Completed
+  - Added `userId` field to all migration models in [schema.prisma](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/prisma/schema.prisma) to ensure data isolation.
+  - Updated [brevo-extraction-service.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/services/migration/brevo-extraction-service.ts) and [hubspot-loading-service.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/services/migration/hubspot-loading-service.ts) to strictly enforce user-based data ownership.
+  - Secured all migration API routes ([extract](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/api/migration/extract/route.ts), [load](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/api/migration/load/route.ts), [data](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/api/migration/data/route.ts), [wipe](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/api/migration/wipe/route.ts)) by filtering database queries by the authenticated user's ID.
+  - Guaranteed that User A can only see and manage their own migrations, with zero visibility into User B's data.
 
 ## 10. Security & Compliance
 

@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Brevo API Key not configured" }, { status: 400 });
     }
 
-    const service = new BrevoExtractionService(config.brevoApiKey);
+    const service = new BrevoExtractionService(config.brevoApiKey, session.user.id);
     await service.extractAll();
 
     return NextResponse.json({ message: "Extraction completed successfully" });

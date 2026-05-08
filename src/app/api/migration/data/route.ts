@@ -19,29 +19,35 @@ export async function GET(request: NextRequest) {
     let data: any[] = [];
     if (type === "deals") {
       data = await (prisma as any).brevoDeal.findMany({
+        where: { userId: session.user.id },
         orderBy: { createdAt: "desc" },
         include: { company: true, contacts: true },
       });
     } else if (type === "notes") {
-      data = await prisma.brevoNote.findMany({
+      data = await (prisma as any).brevoNote.findMany({
+        where: { userId: session.user.id },
         orderBy: { createdAt: "desc" },
         include: { deal: true },
       });
     } else if (type === "tasks") {
-      data = await prisma.brevoTask.findMany({
+      data = await (prisma as any).brevoTask.findMany({
+        where: { userId: session.user.id },
         orderBy: { createdAt: "desc" },
         include: { deal: true },
       });
     } else if (type === "companies") {
       data = await (prisma as any).brevoCompany.findMany({
+        where: { userId: session.user.id },
         orderBy: { createdAt: "desc" },
       });
     } else if (type === "contacts") {
       data = await (prisma as any).brevoContact.findMany({
+        where: { userId: session.user.id },
         orderBy: { createdAt: "desc" },
       });
     } else if (type === "logs") {
       data = await (prisma as any).migrationLog.findMany({
+        where: { userId: session.user.id },
         orderBy: { timestamp: "desc" },
         take: 100,
       });

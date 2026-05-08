@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 
 export class BrevoExtractionService {
   private client: BrevoClient;
+  private userId: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, userId: string) {
     this.client = new BrevoClient({ apiKey });
+    this.userId = userId;
   }
 
   async extractAll() {
@@ -32,12 +34,14 @@ export class BrevoExtractionService {
             name: company?.attributes?.name || company?.name || 'Untitled Company',
             domain: company?.attributes?.domain || company?.domain,
             rawJson: company as any,
+            userId: this.userId,
           },
           create: {
             brevoId: company?.id,
             name: company?.attributes?.name || company?.name || 'Untitled Company',
             domain: company?.attributes?.domain || company?.domain,
             rawJson: company as any,
+            userId: this.userId,
           },
         });
       }
@@ -64,6 +68,7 @@ export class BrevoExtractionService {
             firstName: contact?.attributes?.FIRSTNAME || contact?.firstName,
             lastName: contact?.attributes?.LASTNAME || contact?.lastName,
             rawJson: contact as any,
+            userId: this.userId,
           },
           create: {
             brevoId: contact?.id?.toString(),
@@ -71,6 +76,7 @@ export class BrevoExtractionService {
             firstName: contact?.attributes?.FIRSTNAME || contact?.firstName,
             lastName: contact?.attributes?.LASTNAME || contact?.lastName,
             rawJson: contact as any,
+            userId: this.userId,
           },
         });
       }
@@ -98,6 +104,7 @@ export class BrevoExtractionService {
             closeDate: (deal?.closeDate || deal?.attributes?.closeDate) ? new Date(deal.closeDate || deal.attributes.closeDate) : null,
             rawJson: deal as any,
             companyId: deal?.linkedCompaniesIds?.[0] || deal?.attributes?.linkedCompaniesIds?.[0],
+            userId: this.userId,
           },
           create: {
             brevoId: deal?.id,
@@ -108,6 +115,7 @@ export class BrevoExtractionService {
             closeDate: (deal?.closeDate || deal?.attributes?.closeDate) ? new Date(deal.closeDate || deal.attributes.closeDate) : null,
             rawJson: deal as any,
             companyId: deal?.linkedCompaniesIds?.[0] || deal?.attributes?.linkedCompaniesIds?.[0],
+            userId: this.userId,
           },
         });
 
@@ -141,18 +149,20 @@ export class BrevoExtractionService {
       if (!items || items.length === 0) break;
 
       for (const note of items) {
-        await prisma.brevoNote.upsert({
+        await (prisma as any).brevoNote.upsert({
           where: { brevoId: note?.id },
           update: {
             body: note?.body || '',
             dealId: note?.dealIds?.[0], // Taking the first associated deal
             rawJson: note as any,
+            userId: this.userId,
           },
           create: {
             brevoId: note?.id,
             body: note?.body || '',
             dealId: note?.dealIds?.[0],
             rawJson: note as any,
+            userId: this.userId,
           },
         });
       }
@@ -170,13 +180,14 @@ export class BrevoExtractionService {
       if (!items || items.length === 0) break;
 
       for (const task of items) {
-        await prisma.brevoTask.upsert({
+        await (prisma as any).brevoTask.upsert({
           where: { brevoId: task?.id },
           update: {
             name: task?.name || 'Untitled Task',
             dueDate: task?.dueDate ? new Date(task.dueDate) : null,
             dealId: task?.dealIds?.[0],
             rawJson: task as any,
+            userId: this.userId,
           },
           create: {
             brevoId: task?.id,
@@ -184,6 +195,7 @@ export class BrevoExtractionService {
             dueDate: task?.dueDate ? new Date(task.dueDate) : null,
             dealId: task?.dealIds?.[0],
             rawJson: task as any,
+            userId: this.userId,
           },
         });
       }
