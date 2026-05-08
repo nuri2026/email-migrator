@@ -18,6 +18,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,7 +43,18 @@ export function MigrationDashboard() {
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
     },
-    refetchInterval: 5000,
+    refetchInterval: 3000,
+  });
+
+  const { data: recentLogs } = useQuery({
+    queryKey: ["migration-data", "logs"],
+    queryFn: async () => {
+      const res = await fetch("/api/migration/data?type=logs");
+      if (!res.ok) throw new Error("Failed to fetch logs");
+      const logs = await res.json();
+      return logs.slice(0, 5); // Just show the 5 most recent
+    },
+    refetchInterval: 3000,
   });
 
   const extractMutation = useMutation({
@@ -172,6 +184,52 @@ export function MigrationDashboard() {
       </div>
 
       <div className="flex flex-col gap-4">
+        {recentLogs && recentLogs.length > 0 && (
+          <Card className="border-muted bg-muted/20">
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm font-medium">
+                Recent Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="py-0 pb-3">
+              <div className="space-y-2">
+                {recentLogs.map((log: any) => (
+                  <div
+                    key={log.id}
+                    className="flex items-center justify-between text-xs"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="px-1 py-0 h-4 text-[10px] capitalize"
+                      >
+                        {log.entityType}
+                      </Badge>
+                      <span className="text-muted-foreground truncate max-w-[200px]">
+                        {log.status === "success" ? "Synced" : "Error"}:{" "}
+                        {log.entityId}
+                      </span>
+                    </span>
+                    <span
+                      className={
+                        log.status === "success"
+                          ? "text-green-600"
+                          : "text-destructive font-semibold"
+                      }
+                    >
+                      {log.status === "success" ? (
+                        <CheckCircle2 className="h-3 w-3" />
+                      ) : (
+                        "Failed"
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex gap-4">
           <Button
             onClick={() => extractMutation.mutate()}
