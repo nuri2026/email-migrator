@@ -95,15 +95,35 @@ model BrevoDeal {
   id              String      @id @default(uuid())
   brevoId         String      @unique
   name            String
-  amount          String?     
-  dealStage       String?     
+  amount          String?
+  dealStage       String?
+  dealOwner       String?
+  companyName     String?
+  closeDate       DateTime?
   rawJson         Json
   hubspotId       String?     // Linked after migration
   createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   notes           BrevoNote[]
   tasks           BrevoTask[]
+  activities      BrevoActivity[]
 
   @@map("brevo_deal")
+}
+
+model BrevoActivity {
+  id              String   @id @default(uuid())
+  brevoId         String?  // Some activities might not have a Brevo ID
+  type            String   // e.g., "call", "email", "meeting"
+  content         String?
+  timestamp       DateTime
+  dealId          String
+  deal            BrevoDeal @relation(fields: [dealId], references: [brevoId])
+  hubspotId       String?
+  rawJson         Json
+  createdAt       DateTime @default(now())
+
+  @@map("brevo_activity")
 }
 
 model BrevoNote {

@@ -26,8 +26,10 @@ export class HubSpotLoadingService {
           properties: {
             dealname: deal?.name,
             amount: deal?.amount || "0",
-            dealstage: "appointmentscheduled", // Default stage from requirements
+            dealstage: deal?.dealStage || "appointmentscheduled", // Use staged stage if available
             pipeline: "default",
+            hubspot_owner_id: (deal as any)?.dealOwner || (deal?.rawJson as any)?.dealOwner || undefined, // Map owner if available
+            closedate: (deal as any)?.closeDate?.toISOString?.() || (deal?.rawJson as any)?.closeDate || undefined,
           },
         });
 
@@ -36,6 +38,9 @@ export class HubSpotLoadingService {
             where: { id: deal?.id },
             data: { hubspotId: hsDeal.id },
           });
+          
+          // If company name exists, we might need a separate step to link/create company
+          // For now, metadata is preserved in rawJson and basic properties
         }
       } catch (error) {
         console.error(`Failed to sync deal ${deal?.name}:`, error);

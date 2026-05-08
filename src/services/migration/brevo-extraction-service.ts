@@ -30,6 +30,9 @@ export class BrevoExtractionService {
             name: deal?.name || 'Untitled Deal',
             amount: deal?.amount?.toString(),
             dealStage: deal?.dealStage,
+            dealOwner: deal?.dealOwner,
+            companyName: deal?.companyName,
+            closeDate: deal?.closeDate ? new Date(deal.closeDate) : null,
             rawJson: deal as any,
           },
           create: {
@@ -37,6 +40,9 @@ export class BrevoExtractionService {
             name: deal?.name || 'Untitled Deal',
             amount: deal?.amount?.toString(),
             dealStage: deal?.dealStage,
+            dealOwner: deal?.dealOwner,
+            companyName: deal?.companyName,
+            closeDate: deal?.closeDate ? new Date(deal.closeDate) : null,
             rawJson: deal as any,
           },
         });
