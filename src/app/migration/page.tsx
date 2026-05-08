@@ -4,6 +4,12 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default async function MigrationPage() {
   const session = await auth.api.getSession({
@@ -29,11 +35,24 @@ export default async function MigrationPage() {
         </p>
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-2">
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">1. Configuration</h2>
-          <ConfigForm />
-        </div>
+      <div className="space-y-10">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          defaultValue="configuration"
+        >
+          <AccordionItem value="configuration" className="border-none">
+            <AccordionTrigger className="hover:no-underline py-0 mb-6 flex-row-reverse justify-end gap-2 [&[data-state=open]>svg]:rotate-180">
+              <h2 className="text-xl font-semibold">1. Configuration</h2>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="pb-6">
+                <ConfigForm />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <div className="space-y-6">
           <h2 className="text-xl font-semibold">2. Migration Control</h2>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/shared/Header";
@@ -16,6 +16,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "Next.js Template",
   description:
@@ -29,7 +34,6 @@ export const metadata: Metadata = {
     "Template",
   ],
   authors: [{ name: "Your Name" }],
-  viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
 };
 

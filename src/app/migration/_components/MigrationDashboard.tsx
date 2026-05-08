@@ -36,27 +36,6 @@ export function MigrationDashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["migration-stats"],
-    queryFn: async () => {
-      const res = await fetch("/api/migration/stats");
-      if (!res.ok) throw new Error("Failed to fetch stats");
-      return res.json();
-    },
-    refetchInterval: 3000,
-  });
-
-  const { data: recentLogs } = useQuery({
-    queryKey: ["migration-data", "logs"],
-    queryFn: async () => {
-      const res = await fetch("/api/migration/data?type=logs");
-      if (!res.ok) throw new Error("Failed to fetch logs");
-      const logs = await res.json();
-      return logs.slice(0, 5); // Just show the 5 most recent
-    },
-    refetchInterval: 3000,
-  });
-
   const extractMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch("/api/migration/extract", { method: "POST" });
@@ -107,6 +86,29 @@ export function MigrationDashboard() {
         variant: "destructive",
       });
     },
+  });
+
+  const isProcessing = extractMutation.isPending || syncMutation.isPending;
+
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["migration-stats"],
+    queryFn: async () => {
+      const res = await fetch("/api/migration/stats");
+      if (!res.ok) throw new Error("Failed to fetch stats");
+      return res.json();
+    },
+    refetchInterval: isProcessing ? 3000 : false,
+  });
+
+  const { data: recentLogs } = useQuery({
+    queryKey: ["migration-data", "logs"],
+    queryFn: async () => {
+      const res = await fetch("/api/migration/data?type=logs");
+      if (!res.ok) throw new Error("Failed to fetch logs");
+      const logs = await res.json();
+      return logs.slice(0, 5); // Just show the 5 most recent
+    },
+    // No polling for logs unless specifically needed
   });
 
   const wipeMutation = useMutation({

@@ -135,7 +135,8 @@ Located in `src/app/migration/`:
   - Enhanced [route.ts](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/api/migration/data/route.ts) to support deep fetching of associated entities for preview.
 - **Phase 9: Final Validation & UX Refinement**: ✅ Completed
   - Enhanced [MigrationDashboard.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/migration/_components/MigrationDashboard.tsx) with a "Recent Activity" real-time log feed.
-  - Implemented automatic UI refreshing (3s interval) during active migration phases.
+  - Optimized polling behavior: Requests now only occur during active extraction/sync processes (`isPending`), preventing infinite background noise.
+  - Fixed Next.js 14+ viewport metadata warning by migrating to the separate `viewport` export in [layout.tsx](file:///home/nuriadmin/Documents/Projects/eagle/data_migration/emial-migrator/src/app/layout.tsx).
   - Verified end-to-end extraction and synchronization flows.
   - Finalized security measures (Better Auth integration for all migration routes).
 - **Phase 10: Multi-User Scoping & Data Isolation**: ✅ Completed
