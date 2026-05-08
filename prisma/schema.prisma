@@ -5,13 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  // Using the default output location for Prisma Client
+  provider = "prisma-client"
+  output   = "./generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Better Auth Core Schema
@@ -28,6 +27,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  apiConfig     ApiConfiguration?
 
   @@map("user")
 }
@@ -77,4 +77,58 @@ model Verification {
   @@map("verification")
 }
 
-// Other models
+// Migration Models
+
+model ApiConfiguration {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  brevoApiKey     String?
+  hubspotToken    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("api_configuration")
+}
+
+model BrevoDeal {
+  id              String      @id @default(uuid())
+  brevoId         String      @unique
+  name            String
+  amount          String?     
+  dealStage       String?     
+  rawJson         Json
+  hubspotId       String?     // Linked after migration
+  createdAt       DateTime    @default(now())
+  notes           BrevoNote[]
+  tasks           BrevoTask[]
+
+  @@map("brevo_deal")
+}
+
+model BrevoNote {
+  id              String     @id @default(uuid())
+  brevoId         String     @unique
+  body            String
+  dealId          String?
+  deal            BrevoDeal? @relation(fields: [dealId], references: [brevoId])
+  hubspotId       String?
+  rawJson         Json
+  createdAt       DateTime   @default(now())
+
+  @@map("brevo_note")
+}
+
+model BrevoTask {
+  id              String     @id @default(uuid())
+  brevoId         String     @unique
+  name            String
+  dueDate         DateTime?  
+  dealId          String?
+  deal            BrevoDeal? @relation(fields: [dealId], references: [brevoId])
+  hubspotId       String?
+  rawJson         Json
+  createdAt       DateTime   @default(now())
+
+  @@map("brevo_task")
+}
