@@ -10,6 +10,7 @@ import {
   Info,
   Mail,
   Calendar,
+  ArrowRightLeft,
 } from "lucide-react";
 
 export const categoryOptions = [
@@ -48,6 +49,7 @@ export const adminLinks = [
 
 export const navLinks = [
   { name: "Home", href: "/", icon: Home },
+  { name: "Migration", href: "/migration", icon: ArrowRightLeft },
   { name: "About", href: "/about", icon: Info },
   { name: "Contact", href: "/contact", icon: Mail },
 ];
